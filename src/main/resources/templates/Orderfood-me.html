@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý Đặt Món - Admin</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #c0392b; /* Màu đỏ chủ đạo */
+      --light-color: #fff;
+      --dark-color: #333;
+    }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background-color: #fdfdfd;
+      color: #333;
+      padding-top: 80px; /* Để dành chỗ cho header nếu header cố định */
+    }
+    h2 {
+      color: var(--primary-color);
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+    /* Table styling */
+    .table thead th {
+      background-color: var(--primary-color);
+      color: var(--light-color);
+    }
+    .table tbody tr:hover {
+      background-color: #f2f2f2;
+    }
+    /* Input datetime dạng read-only */
+    .input-datetime {
+      border: none;
+      background: transparent;
+      pointer-events: none;
+    }
+    .btn {
+      height: 40px;
+    }
+  </style>
+</head>
+<body>
+<!-- Nhúng Header (Sử dụng Thymeleaf, nếu có) -->
+<th:block th:replace="Layout/Header"></th:block>
+
+<div class="container mt-5">
+  <h2>Quản lý Đặt Món</h2>
+
+  <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+  <!-- Bảng hiển thị danh sách đơn đặt món -->
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped table-hover mt-3">
+      <thead>
+      <tr>
+        <th>ID</th>
+        <th>Ảnh</th>
+        <th>Món ăn</th>
+        <th>Thời gian đặt</th>
+        <th>Số lượng món</th>
+        <th>Trạng thái</th>
+        <th>Hành động</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="order : ${orderFoodEntities}">
+        <td th:text="${order.id}"></td>
+        <td>
+          <img th:if="${order.menu != null}" th:src="${order.menu.imageUrl}" width="100" alt="Ảnh món ăn"/>
+          <span th:unless="${order.menu != null}">Không có ảnh</span>
+        </td>
+        <td th:text="${order.menu != null} ? ${order.menu.name} : 'Không có món'"></td>
+        <td>
+          <input type="datetime-local" class="form-control input-datetime"
+                 th:value="${order.createAt != null ? order.createAt : ''}" style="background: none; border: none" readonly>
+        </td>
+        <td th:text="${order.quantity}"></td>
+        <td th:text="${order.status}"></td>
+        <td>
+          <a th:href="@{/user/dat-mon/delete/{id}(id=${order.id})}" class="btn btn-warning btn-sm">
+            <i class="fa-solid fa-trash"></i> Xóa
+          </a>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Nhúng Footer (Sử dụng Thymeleaf, nếu có) -->
+<th:block th:replace="Layout/Footer"></th:block>
+
+<!-- Bootstrap JS Bundle (bao gồm Popper) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Nhà Hàng Ẩm Thực Hàn Quốc</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #c0392b; /* Màu đỏ chủ đạo */
+            --light-color: #fff;
+            --dark-color: #333;
+        }
+        body {
+            background-color: #fdfdfd;
+            font-family: 'Arial', sans-serif;
+        }
+        /* Navbar: sử dụng nền đỏ, chữ trắng và hiệu ứng bóng nhẹ */
+        .navbar {
+            background-color: var(--primary-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .navbar-brand {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--light-color) !important;
+        }
+        .nav-link {
+            font-size: 1.1rem;
+            color: var(--light-color) !important;
+            margin: 0 10px;
+            transition: color 0.3s ease;
+        }
+        .nav-link:hover {
+            color: #f8f9fa !important;
+        }
+        /* Button cho Đăng Nhập & Đăng Ký: style tròn và nhẹ nhàng */
+        .navbar .btn {
+            border-radius: 20px;
+        }
+        /* Carousel */
+        .carousel-item img {
+            height: 500px;
+            object-fit: cover;
+            width: 100%;
+        }
+        /* Thực đơn nổi bật */
+        .menu-item {
+            background-color: #fff;
+            border: 1px solid #eaeaea;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .menu-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .menu-item img {
+            max-width: 100%;
+            border-radius: 8px;
+        }
+        .menu-item h5 {
+            margin-top: 15px;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        /* Tiêu đề section */
+        h2.section-title {
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+        /* Footer: nền đỏ, chữ trắng */
+        footer {
+            background-color: var(--primary-color);
+            padding: 20px 0;
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--light-color);
+        }
+        .image-menu{
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+<!-- Include Header -->
+<th:block th:replace="Layout/Header"></th:block>
+
+<!-- Carousel -->
+<div id="homepageCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
+    <div class="carousel-inner">
+        <div class="carousel-item active">
+            <img src="https://media.loveitopcdn.com/24813/am-thuc-han-quoc.jpg" class="d-block w-100" alt="Slide 1">
+        </div>
+        <div class="carousel-item">
+            <img src="https://cdn.vntrip.vn/cam-nang/wp-content/uploads/2018/08/van-hoa-am-thuc-han-quoc-vntrip.jpg" class="d-block w-100" alt="Slide 2">
+        </div>
+        <div class="carousel-item">
+            <img src="https://statics.vincom.com.vn/xu-huong/chi_tiet_xu_huong/mon-an-han-quoc/thit-1.jpeg" class="d-block w-100" alt="Slide 3">
+        </div>
+        <div class="carousel-item">
+            <img src="https://statics.vincom.com.vn/xu-huong/chi_tiet_xu_huong/mon-an-han-quoc/gimpapne-1200x676.jpeg" class="d-block w-100" alt="Slide 4">
+        </div>
+        <div class="carousel-item">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTsJq8VaX-kNmYLIn7u-KsKpO0svDlO97kJ3w&s" class="d-block w-100" alt="Slide 5">
+        </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#homepageCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Trước</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#homepageCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Tiếp</span>
+    </button>
+</div>
+
+<!-- Thực đơn nổi bật -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-4 section-title">Thực Đơn Nổi Bật</h2>
+        <div class="row g-4">
+            <div class="col-md-4 " th:each="menu : ${menuList}">
+                <div class="menu-item">
+                    <img  th:src="${menu.imageUrl}" alt="Món Hàn 1" class="image-menu">
+                    <h5 th:text="${menu.name}">Món Hàn 1</h5>
+                    <p th:text="${#numbers.formatDecimal(menu.price, 0, 'COMMA', 0, 'POINT') + ' VND'}">Miêu tả món ăn tinh tế và hấp dẫn.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <p>&copy; 2025 Nhà Hàng Ẩm Thực Hàn Quốc. Địa chỉ: 123 Đường ABC, Quận XYZ, TP.HCM. SĐT: 0123 456 789.</p>
+        <p>Email: info@hanquocrestaurant.com</p>
+    </div>
+</footer>
+
+<!-- Bootstrap JS Bundle (bao gồm Popper) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
