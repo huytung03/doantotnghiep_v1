@@ -6,6 +6,7 @@ import com.example.doantotnghiep_tranhuytung.Repository.CategoryRepository;
 import com.example.doantotnghiep_tranhuytung.Repository.MenuRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -72,24 +73,27 @@ public class MenuController {
 
         try {
             if (startDateStr != null && !startDateStr.isEmpty()) {
-                Date parsedDate = dateFormat.parse(startDateStr);
-                startDate = new Timestamp(parsedDate.getTime());
+                startDate = new Timestamp(dateFormat.parse(startDateStr).getTime());
             }
             if (endDateStr != null && !endDateStr.isEmpty()) {
-                Date parsedDate = dateFormat.parse(endDateStr);
-                endDate = new Timestamp(parsedDate.getTime());
+                endDate = new Timestamp(dateFormat.parse(endDateStr).getTime());
             }
         } catch (Exception e) {
             model.addAttribute("error", "Lỗi chuyển đổi ngày tháng");
         }
 
-        // Lấy danh sách món ăn theo tiêu chí tìm kiếm
-        Page<MenuEntity> menus = MenuRepository.searchMenus(name, categoryId, minPrice, maxPrice, startDate, endDate, PageRequest.of(page, size));
+        // Tạo PageRequest đảm bảo chỉ lấy đúng số phần tử mong muốn
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").ascending());
+        Page<MenuEntity> menus = MenuRepository.searchMenus(name, categoryId, minPrice, maxPrice, startDate, endDate, pageRequest);
+
+        // Kiểm tra số lượng phần tử sau khi lấy dữ liệu
+        System.out.println("Số phần tử trong trang: " + menus.getContent().size());
 
         model.addAttribute("menus", menus.getContent());
         model.addAttribute("categories", categoryRepository.findAll());
         model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", Math.max(menus.getTotalPages(), 1));
+        model.addAttribute("totalPages", menus.getTotalPages());
+        model.addAttribute("pageSize", size); // Thêm để kiểm tra trên giao diện
 
         return "Admin/Menu/list";
     }
@@ -152,13 +156,13 @@ public class MenuController {
     public String editMenu(@PathVariable Long id, @ModelAttribute MenuEntity menu, MultipartFile imageFile, Model model) {
         try {
             Optional<CategoryEntity> categoryEntity = categoryRepository.findById(menu.getCategoryId().getId());
-
+            MenuEntity existingMenu = MenuRepository.findById(id).orElseThrow();
             // Nếu có ảnh mới tải lên thì cập nhật, nếu không thì giữ ảnh cũ
             if (imageFile != null && !imageFile.isEmpty()) {
                 menu.setImage(imageFile.getBytes());
                 menu.setImageUrl("/image/menu/" + id);
             } else {
-                MenuEntity existingMenu = MenuRepository.findById(id).orElseThrow();
+
                 menu.setImage(existingMenu.getImage());
                 menu.setImageUrl(existingMenu.getImageUrl());
             }
@@ -166,6 +170,12 @@ public class MenuController {
             menu.setId(id);
             menu.setCategoryId(categoryEntity.orElseThrow());
             menu.setUpdatedAt(Timestamp.from(Instant.now()));
+            if (existingMenu.getCreatedAt() != null){
+                menu.setCreatedAt(existingMenu.getCreatedAt());
+            }else {
+                menu.setCreatedAt(Timestamp.from(Instant.now()));
+            }
+
 
             MenuRepository.save(menu);
             return "redirect:/admin/thuc-don/list";

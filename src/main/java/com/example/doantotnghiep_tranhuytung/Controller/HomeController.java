@@ -2,11 +2,10 @@ package com.example.doantotnghiep_tranhuytung.Controller;
 
 import com.example.doantotnghiep_tranhuytung.Entity.MenuEntity;
 import com.example.doantotnghiep_tranhuytung.Entity.ReviewsEntity;
-import com.example.doantotnghiep_tranhuytung.Repository.CategoryRepository;
-import com.example.doantotnghiep_tranhuytung.Repository.MenuRepository;
-import com.example.doantotnghiep_tranhuytung.Repository.ReviewRepository;
+import com.example.doantotnghiep_tranhuytung.Repository.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,15 +27,21 @@ public class HomeController {
     private final MenuRepository menuRepository;
     private final CategoryRepository categoryRepository;
     private final ReviewRepository reviewRepository;
+    private final UserRepository userRepository;
+    private final ReservationRepository reservationRepository;
+    private final OrderRepository orderRepository;
     /**
      * Constructor để khởi tạo controller với một repository để thao tác với dữ liệu thực đơn (menu).
      *
      * @param menuRepository Đối tượng giúp truy vấn dữ liệu thực đơn từ cơ sở dữ liệu.
      */
-    public HomeController(MenuRepository menuRepository, CategoryRepository categoryRepository, ReviewRepository reviewRepository) {
+    public HomeController(MenuRepository menuRepository, CategoryRepository categoryRepository, ReviewRepository reviewRepository, UserRepository userRepository, ReservationRepository reservationRepository, OrderRepository orderRepository) {
         this.menuRepository = menuRepository;
         this.categoryRepository = categoryRepository;
         this.reviewRepository = reviewRepository;
+        this.userRepository = userRepository;
+        this.reservationRepository = reservationRepository;
+        this.orderRepository = orderRepository;
     }
 
     /**
@@ -48,8 +53,9 @@ public class HomeController {
      */
     @GetMapping("/home")
     public String home(Model model) {
-        // Lấy toàn bộ danh sách thực đơn từ cơ sở dữ liệu và thêm vào model để hiển thị lên giao diện
-        model.addAttribute("menuList", menuRepository.findAllByDeleteAtIsNull());
+        // Lấy 9 dữ liệu đầu tiên từ cơ sở dữ liệu
+        Pageable pageable = PageRequest.of(0, 9); // Trang 0, lấy 9 phần tử
+        model.addAttribute("menuList", menuRepository.findAllByDeleteAtIsNullLimit9(pageable));
         return "home";
     }
 
@@ -97,7 +103,11 @@ public class HomeController {
      * @return Trả về trang "Admin/AdminHome.html".
      */
     @GetMapping("/admin")
-    public String admin() {
+    public String admin(Model model) {
+        model.addAttribute("userCount", (int) userRepository.count());
+        model.addAttribute("menuCount", (int) menuRepository.count());
+        model.addAttribute("bookingCount", (int) reservationRepository.count());
+        model.addAttribute("orderCount", (int) orderRepository.count());
         return "Admin/AdminHome";
     }
     @GetMapping("/thuc-don/{id}")

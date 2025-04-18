@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/user/dat-mon")
@@ -51,14 +52,32 @@ public class UserOrderFoodController {
             MenuEntity menuEntity = menuRepository.findById(id).get();
             String username = (String) session.getAttribute("userEmail");
             UserEntity user = userRepository.findByEmail(username).get();
-            OrderFoodEntity orderFoodEntity = new OrderFoodEntity();
-            orderFoodEntity.setMenu(menuEntity);
-            orderFoodEntity.setUser(user);
-            orderFoodEntity.setQuantity(1);
-            BigDecimal totalPrice = menuEntity.getPrice().multiply(new BigDecimal(orderFoodEntity.getQuantity()));
-            orderFoodEntity.setPrice(totalPrice);
-            orderFoodEntity.setStatus("Đang chờ");
-            orderFoodEntity.setCreateAt(Timestamp.from(Instant.now()));
+
+            // Tìm kiếm xem món ăn đã tồn tại trong đơn hàng của user chưa
+            Optional<OrderFoodEntity> existingOrder = orderFoodRepository
+                    .findByUserAndMenuAndStatus(user.getId(), menuEntity.getId(), "Đang chờ");
+
+            OrderFoodEntity orderFoodEntity;
+
+            if (existingOrder.isPresent()) {
+                // Nếu đã tồn tại, cập nhật số lượng
+                orderFoodEntity = existingOrder.get();
+                int newQuantity = orderFoodEntity.getQuantity() + 1;
+                orderFoodEntity.setQuantity(newQuantity);
+                BigDecimal totalPrice = menuEntity.getPrice().multiply(new BigDecimal(newQuantity));
+                orderFoodEntity.setPrice(totalPrice);
+            } else {
+                // Nếu chưa tồn tại, tạo mới
+                orderFoodEntity = new OrderFoodEntity();
+                orderFoodEntity.setMenu(menuEntity);
+                orderFoodEntity.setUser(user);
+                orderFoodEntity.setQuantity(1);
+                BigDecimal totalPrice = menuEntity.getPrice().multiply(new BigDecimal(1));
+                orderFoodEntity.setPrice(totalPrice);
+                orderFoodEntity.setStatus("Đang chờ");
+                orderFoodEntity.setCreateAt(Timestamp.from(Instant.now()));
+            }
+
             orderFoodRepository.save(orderFoodEntity);
             return "redirect:/user/dat-mon/me";
         } catch (Exception e) {
@@ -66,7 +85,7 @@ public class UserOrderFoodController {
             return "Orderfood-me";
         }
     }
-    @PostMapping("/update/quantity/up/{id}")
+    @GetMapping("/update/quantity/up/{id}")
     public String updateQuantityUp(@PathVariable Long id, Model model) {
         try {
             OrderFoodEntity orderFoodEntity = orderFoodRepository.findById(id).get();
@@ -80,7 +99,7 @@ public class UserOrderFoodController {
    return "Orderfood-me";
         }
     }
-    @PostMapping("/update/quantity/down/{id}")
+    @GetMapping("/update/quantity/down/{id}")
     public String updateQuantityDown(@PathVariable Long id, Model model) {
         try {
             OrderFoodEntity orderFoodEntity = orderFoodRepository.findById(id).get();

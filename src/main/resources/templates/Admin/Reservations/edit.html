@@ -72,10 +72,10 @@
       <div class="mb-3">
         <label for="status" class="form-label">Trạng thái</label>
         <select class="form-control" id="status" name="status" >
-          <option value="Đang chờ">Đang chờ</option>
-          <option value="Đã xác nhận">Đã xác nhận</option>
-          <option value="Đang diễn ra">Đang diễn ra</option>
-          <option value="Đã hoàn thành">Đã hoàn thành</option>
+          <option value="Đang chờ" th:selected="${reservation.status == 'Đang chờ'}">Đang chờ</option>
+          <option value="Đã xác nhận" th:selected="${reservation.status == 'Đã xác nhận'}">Đã xác nhận</option>
+          <option value="Đang diễn ra" th:selected="${reservation.status == 'Đang diễn ra'}">Đang diễn ra</option>
+          <option value="Đã hoàn thành" th:selected="${reservation.status == 'Đã hoàn thành'}">Đã hoàn thành</option>
           <option value="Đã hủy">Đã hủy</option>
         </select>
       </div>

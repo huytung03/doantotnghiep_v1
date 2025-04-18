@@ -168,16 +168,16 @@
           <ul class="pagination justify-content-center">
             <th:block th:if="${totalPages > 1}">
               <li class="page-item">
-                <a class="page-link" th:href="@{/admin/category/list(page=${currentPage > 0 ? currentPage - 1 : 0})}">Trang trước</a>
+                <a class="page-link" th:href="@{/thuc-don(page=${currentPage > 0 ? currentPage - 1 : 0})}"><i class="fa-solid fa-chevron-left"></i></a>
               </li>
             </th:block>
             <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
                 class="page-item" th:classappend="${i == currentPage} ? ' active' : ''">
-              <a class="page-link" th:href="@{/admin/category/list(page=${i}, name=${param.name})}" th:text="${i + 1}"></a>
+              <a class="page-link" th:href="@{/thuc-don(page=${i}, name=${param.name})}" th:text="${i + 1}"></a>
             </li>
             <th:block th:if="${currentPage + 1 < totalPages}">
               <li class="page-item">
-                <a class="page-link" th:href="@{/admin/category/list(page=${currentPage + 1})}">Trang sau</a>
+                <a class="page-link" th:href="@{/thuc-don(page=${currentPage + 1})}"><i class="fa-solid fa-chevron-right"></i></a>
               </li>
             </th:block>
           </ul>
